@@ -1,0 +1,173 @@
+Package de.vilandgr.cssc;
+
+Helpers
+  all      = [0 .. 0xffff];
+  tab      = 9;
+  lf       = 10;
+  f        = 12;
+  cr       = 13;
+  cr_lf    = cr lf;
+  nl       = lf | cr_lf | cr | f;
+  singquot = 39;
+  dublquot = 34;
+  bs       = 92;
+  upper    = ['A'..'Z'];
+  lower    = ['a'..'z'];
+  digit    = ['0'..'9'];
+  h        = lower | digit;
+  nonascii = [200 .. 377];
+  unicode  = bs h h? h? h? h? h? (cr_lf | tab | cr| lf | f)?;
+  nonlf    = [[[[all - cr] - lf] - tab] - f];
+  escchars = [[nonlf - digit] - lower];
+  escape   = unicode | bs escchars;
+  nmstart  = [lower + '_'] | nonascii | escape;
+  nmchar   = [[[lower + upper] + '_'] + '-'] | digit | nonascii | escape;
+  string1  = dublquot ([nonlf - dublquot]| nl | escape)* dublquot;
+  string2  = singquot ([nonlf - singquot]| nl | escape)* singquot;
+  invalid1 = dublquot ([nonlf - dublquot]| nl | escape)*;
+  invalid2 = singquot ([nonlf - singquot]| nl | escape)*;
+  
+  comment  = '/*' [all - '*']* '*'+ ([[all - '*'] - '/'] [all - '*']*  '*'+) '*/';
+  ident    = '-'? nmstart nmchar*;
+  name     = nmchar+;
+  num      = digit+ | digit* '.' digit+;
+  string   = string1 | string2;
+  invalid  = invalid1 | invalid2;
+  url      = (string | nonascii | escape)* | [all - ')']*;
+  s        = (' ' | tab | cr| lf | f)+;
+  w        = s?;
+
+Tokens
+  space         = s;
+
+  comment       = comment;                      /* ignore comments */
+  
+  includes      = '~=';
+  dashmatch     = '|=';
+  equals        = '=';
+
+  string        = string;
+  invalid       = invalid;                      /* unclosed string */
+
+  ident         = ident;
+  
+  hash          = '#' name;
+  
+  import_sym    = '@import';
+  page_sym      = '@page';
+  media_sym     = '@media';
+  charset_sym   = '@charset ';
+  special_sym   = '@' ident;
+
+  important_sym = '!' (w | comment)* 'important';
+
+  ems           = num 'em';
+  exs           = num 'ex';
+  lenght        = num ('px' | 'cm' | 'mm' | 'in' | 'pt' | 'pc');
+  angle         = num ('deg' | 'rad' | 'grad');
+  time          = num ('ms' | 's');
+  freq          = num ('hz' | 'khz');
+  dimension     = num ident;
+  
+  percentage    = num '%';
+  number        = num;
+
+  data          = nmchar+;
+  uri           = 'url(' w url w ')';
+  
+  function      = [[[[lower + upper] + digit] + '_'] + '-']+ '(';
+  
+  lbrace        = '(';
+  rbrace        = ')';
+  labrace       = '[';
+  rabrace       = ']';
+  lblock        = '{';
+  rblock        = '}';
+  
+  comma         = ',';
+  dot           = '.';
+  semi          = ';';
+  colon         = ':';
+  
+  select_all    = '*';
+  slash         = '/';
+  plus          = '+';
+  child         = '>';
+  minus         = '-';
+
+Ignored Tokens
+  comment;
+
+Productions
+  stylesheet     = charset? import? set+;
+  eclass         = dot ident;
+  property       = ident space*;
+  medium         = ident space*;
+  pseudo_page    = colon ident space*;
+  operator       = {slash} slash space* | 
+                   {comma} comma space* |
+                   {equal} equals space*;
+  combinator     = {plus} plus space* | 
+                   {child} child space*;
+  unary_operator = {minus} minus | 
+                   {plus} plus;
+  media_list_ap  = comma space* medium;
+  media_list     = medium media_list_ap*;
+  hexcolor       = hash space*;
+  prio           = important_sym space*;
+  element_name   = {ident} ident |
+                   {special} special_sym |
+                   {all} select_all;
+  value          = {percangate} percentage | 
+                   {lenght} lenght | 
+                   {ems} ems | 
+                   {exs} exs | 
+                   {angle} angle | 
+                   {time} time | 
+                   {freq} freq |
+                   {number} number;
+  term           = unary_operator? value space* | 
+                   {string} string space* | 
+                   {ident} ident space* | 
+                   {uri} uri space* | 
+                   {hexcolor} hexcolor | 
+                   {function} function_declaration |
+                   {data} data space* ;
+  expr_ap        = operator? term;
+  expr           = term expr_ap*;
+  declaration    = property colon space* expr prio?;
+  function_declaration = function [ls]:space* expr rbrace [rs]:space*;
+  ident_space    = ident space*;
+  ident_or_func  = {ident} ident | 
+                   {function} function space* ident_space? rbrace;
+  pseudo         = colon ident_or_func;
+  comb_selector  = combinator? selector;
+  selector_ap    = {combinator} combinator selector | 
+                   {selector} space+ comb_selector?;
+  selector       = simple_selector selector_ap?;
+  media          = {media} media_sym [ls]:space* media_list lblock [ms]:space* ruleset* rblock [rs]:space*;
+  simple_selector_element = {hash} hash | 
+                   {eclass} eclass | 
+                   {attrib} attrib | 
+                   {pseudo} pseudo;
+  simple_selector = element_name simple_selector_element* | 
+                    {simple_selectors} simple_selector_element+;
+  page_declaration_ap = semi space* declaration?;
+  page           = page_sym [ls]:space* pseudo_page? lblock [ms]:space* declaration? page_declaration_ap* rblock [rs]:space*;
+  string_or_uri  = {string} string |
+                   {uri} uri;
+  import         = import_sym [ls]:space* string_or_uri [ms]:space* media_list? semi [rs]:space*;
+  ruleset_selector_ap = comma space* selector;
+  ruleset_declaration_ap = semi space* declaration?;
+  ruleset        = selector ruleset_selector_ap* lblock [ms]:space* declaration? ruleset_declaration_ap* rblock [rs]:space*;
+  attrib_operator = {equals} equals | 
+                    {includes} includes | 
+                    {dashmatch} dashmatch;
+  ident_or_string = {ident} ident | 
+                    {string} string;
+  attribute_expr = attrib_operator [ls]:space* ident_or_string [rs]:space*;
+  attrib         = labrace [ls]:space* ident [ms]:space* attribute_expr? rabrace;
+  charset        = charset_sym string semi;
+  set            = {ruleset} ruleset | 
+                   {media} media | 
+                   {page} page;

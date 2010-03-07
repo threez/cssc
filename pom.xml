@@ -1,0 +1,32 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>cssc</groupId>
+	<artifactId>cssc</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>cssc</name>
+	<description>CSS Compiler
+
+under the APL2.0 see LICENSE</description>
+	<dependencies>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>sablecc-maven-plugin</artifactId>
+				<configuration>
+					<sourceDirectory>src/main/grammar</sourceDirectory>
+					<outputDirectory>src/main/java</outputDirectory>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

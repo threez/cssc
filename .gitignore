@@ -1,0 +1,11 @@
+.DS_Store
+.settings
+.project
+.classpath
+target/generated-sources
+target/css.grammar
+target
+src/main/java/de/vilandgr/cssc/analysis
+src/main/java/de/vilandgr/cssc/lexer
+src/main/java/de/vilandgr/cssc/node
+src/main/java/de/vilandgr/cssc/parser
