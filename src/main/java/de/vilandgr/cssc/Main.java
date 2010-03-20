@@ -18,6 +18,7 @@ public class Main {
 			LexerException {
 
 		for (String path : args) {
+			System.out.println("/* File: " + path + " */");
 			// Create a Parser instance.
 			InputStream is = new FileInputStream(path);
 			Lexer l = new Lexer(new PushbackReader(new InputStreamReader(is)));
@@ -28,7 +29,7 @@ public class Main {
 			
 			// Apply the translation.
 			tree.apply(new VariablesAdapter());
-			tree.apply(new CompressingPrinter());
+			tree.apply(new ResolveNestingAdapter());
 		}
 	}
 
