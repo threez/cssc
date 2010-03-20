@@ -27,7 +27,7 @@ Helpers
   invalid1 = dublquot ([nonlf - dublquot]| nl | escape)*;
   invalid2 = singquot ([nonlf - singquot]| nl | escape)*;
   
-  comment  = '/*' [all - '*']* '*'+ ([[all - '*'] - '/'] [all - '*']*  '*'+) '*/';
+  comment  = '/*' [all - '*']* '*'+ ([[all - '*'] - '/'] [all - '*']*  '*'+)* '/';
   ident    = '-'? nmstart nmchar*;
   name     = nmchar+;
   num      = digit+ | digit* '.' digit+;
@@ -94,6 +94,8 @@ Tokens
   plus          = '+';
   child         = '>';
   minus         = '-';
+  
+  parent		= '&';
 
 Ignored Tokens
   comment;
@@ -135,7 +137,8 @@ Productions
                    {data} data space* ;
   expr_ap        = operator? term;
   expr           = term expr_ap*;
-  declaration    = property colon space* expr prio?;
+  declaration    = property colon space+ expr prio? |
+  				   {ruleset} ruleset+;
   function_declaration = function [ls]:space* expr rbrace [rs]:space*;
   ident_space    = ident space*;
   ident_or_func  = {ident} ident | 
@@ -149,7 +152,8 @@ Productions
   simple_selector_element = {hash} hash | 
                    {eclass} eclass | 
                    {attrib} attrib | 
-                   {pseudo} pseudo;
+                   {pseudo} pseudo |
+                   {parent} parent simple_selector_element;
   simple_selector = element_name simple_selector_element* | 
                     {simple_selectors} simple_selector_element+;
   page_declaration_ap = semi space* declaration?;
