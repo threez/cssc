@@ -1,0 +1,39 @@
+@variables {
+	font-size: 12px;
+}
+
+#test .test {
+	.blah, .foo, .bar {
+		&.blub {
+			font-size: var(font-size)
+		}
+	}
+	simple {
+		.simple {
+			font-size: 1px;
+			a {
+				font-family: "Arial";
+				color: #123231;
+				font-size: var(font-size)
+			}
+		
+			b{
+				font-family: "Arial";
+				color: #123231;
+				font-size: var(font-size)
+			}
+			
+			a {
+				background: black
+			}
+		}
+	}
+	#a1, #a2 {
+		font-family: "Arial"
+	}
+	.b1, .b2 {
+		#style, #style2, #style3, &#style4 {
+			color: #123231
+		}
+	}
+}

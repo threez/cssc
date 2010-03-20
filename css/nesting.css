@@ -1,0 +1,20 @@
+@variables {
+	test: 1px;
+    blah: "asdasd",Arial;
+    hello: #asdasd;
+}
+
+#root.test .blah {
+	font-color: var(hello);
+	
+	.test {
+		font-family: var(blah);
+		
+		.blah {
+			font-size: var(test);
+		}
+		.second {
+			color: var(hello);
+		}
+	}
+}
