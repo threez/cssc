@@ -4,6 +4,8 @@ import java.util.Hashtable;
 
 import de.vilandgr.cssc.analysis.*;
 import de.vilandgr.cssc.node.ADeclaration;
+import de.vilandgr.cssc.node.AExpr;
+import de.vilandgr.cssc.node.AExprAp;
 import de.vilandgr.cssc.node.AFunctionDeclaration;
 import de.vilandgr.cssc.node.ASpecialElementName;
 import de.vilandgr.cssc.node.Node;
@@ -30,7 +32,7 @@ public class VariablesAdapter extends DepthFirstAdapter {
 	
 	@Override
 	public void defaultIn(Node node) {
-		if (debug) System.out.println(tabs() + "->" + node.getClass().getSimpleName());
+		if (debug) System.out.println(tabs() + "->" + node.getClass().getSimpleName() + "[" + node + "]");
 		
 		// check for variables section
 		if(node instanceof ASpecialElementName) {
@@ -53,7 +55,16 @@ public class VariablesAdapter extends DepthFirstAdapter {
 			String exprText = func.getExpr().toString().trim();
 			if (funcName.equals(VAR_FUNC)) {
 				if (variables.get(exprText) != null) {
-					func.parent().parent().replaceBy(variables.get(exprText));
+					Node toRepelace = func.parent().parent();
+					
+					if (toRepelace instanceof AExprAp) {
+						AExpr ex = (AExpr)variables.get(exprText);
+						AExprAp expr = new AExprAp();
+						expr.setTerm(ex.getTerm());
+						toRepelace.replaceBy(expr);
+					} else {
+						toRepelace.replaceBy((Node)variables.get(exprText).clone());
+					}
 				} else {
 					throw new RuntimeException("undefiend variable: '" + exprText + "'");
 				}
