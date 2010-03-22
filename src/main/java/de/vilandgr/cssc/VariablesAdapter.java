@@ -9,6 +9,7 @@ import de.vilandgr.cssc.node.AExprAp;
 import de.vilandgr.cssc.node.AFunctionDeclaration;
 import de.vilandgr.cssc.node.ASpecialElementName;
 import de.vilandgr.cssc.node.Node;
+import de.vilandgr.cssc.node.PTerm;
 
 public class VariablesAdapter extends DepthFirstAdapter {
 	private static final int NO_INDEND = -1;
@@ -60,7 +61,7 @@ public class VariablesAdapter extends DepthFirstAdapter {
 					if (toRepelace instanceof AExprAp) {
 						AExpr ex = (AExpr)variables.get(exprText);
 						AExprAp expr = new AExprAp();
-						expr.setTerm(ex.getTerm());
+						expr.setTerm((PTerm)ex.getTerm().clone());
 						toRepelace.replaceBy(expr);
 					} else {
 						toRepelace.replaceBy((Node)variables.get(exprText).clone());

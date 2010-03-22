@@ -47,8 +47,8 @@ class SelectorPrinter {
 				}
 			}
 		} else {
-			path.append(SEP);
 			for (ASelector sel : selectors) {
+				path.append(SEP);
 				path.append(SPACE);
 				path.append(getCompressed(sel));
 				if (selector != null) {
